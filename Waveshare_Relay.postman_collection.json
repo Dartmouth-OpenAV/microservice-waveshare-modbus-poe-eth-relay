@@ -1,0 +1,411 @@
+{
+	"info": {
+		"name": "Waveshare Relay",
+		"description": "A collection of all possible GET and PUT calls for the Waveshare Modbus POE ETH Relay microservice. You can replace the values in double curly brackets manually or create matching environment variables that will automatically fill in the values.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET State",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/state/{{relayNumber}}",
+					"protocol": "http",
+					"host": [
+						"{{microserviceURL}}"
+					],
+					"path": [
+						"{{deviceFQDN}}",
+						"state",
+						"{{relayNumber}}"
+					]
+				},
+				"description": "Returns \"on\" or \"off\" for one relay. Relays are numbered from 1 up to the number of channels on the device (8 on the 8 channel version)."
+			},
+			"response": [
+				{
+					"name": "GET State",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/state/{{relayNumber}}",
+							"protocol": "http",
+							"host": [
+								"{{microserviceURL}}"
+							],
+							"path": [
+								"{{deviceFQDN}}",
+								"state",
+								"{{relayNumber}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "\"off\""
+				}
+			]
+		},
+		{
+			"name": "GET States",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/states",
+					"protocol": "http",
+					"host": [
+						"{{microserviceURL}}"
+					],
+					"path": [
+						"{{deviceFQDN}}",
+						"states"
+					]
+				},
+				"description": "Returns the state of every relay on the device as a JSON object keyed by relay number."
+			},
+			"response": [
+				{
+					"name": "GET States",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/states",
+							"protocol": "http",
+							"host": [
+								"{{microserviceURL}}"
+							],
+							"path": [
+								"{{deviceFQDN}}",
+								"states"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "{\"1\":\"off\",\"2\":\"off\",\"3\":\"off\",\"4\":\"off\",\"5\":\"off\",\"6\":\"off\",\"7\":\"off\",\"8\":\"off\"}"
+				}
+			]
+		},
+		{
+			"name": "GET Healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/healthcheck",
+					"protocol": "http",
+					"host": [
+						"{{microserviceURL}}"
+					],
+					"path": [
+						"{{deviceFQDN}}",
+						"healthcheck"
+					]
+				},
+				"description": "Reads the firmware version and detects the number of relays. Returns \"true firmware: Vx.xx relays: N\", \"false\", or \"no connection\"."
+			},
+			"response": [
+				{
+					"name": "GET Healthcheck",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/healthcheck",
+							"protocol": "http",
+							"host": [
+								"{{microserviceURL}}"
+							],
+							"path": [
+								"{{deviceFQDN}}",
+								"healthcheck"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "\"true firmware: V3.00 relays: 8\""
+				}
+			]
+		},
+		{
+			"name": "GET Errors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/errors",
+					"protocol": "http",
+					"host": [
+						"{{microserviceURL}}"
+					],
+					"path": [
+						"{{deviceFQDN}}",
+						"errors"
+					]
+				},
+				"description": "Returns (and clears) the errors the microservice has logged for this device. HTTP 500 if there are any."
+			},
+			"response": [
+				{
+					"name": "GET Errors",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/errors",
+							"protocol": "http",
+							"host": [
+								"{{microserviceURL}}"
+							],
+							"path": [
+								"{{deviceFQDN}}",
+								"errors"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "{}"
+				}
+			]
+		},
+		{
+			"name": "SET State",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/state/{{relayNumber}}",
+					"protocol": "http",
+					"host": [
+						"{{microserviceURL}}"
+					],
+					"path": [
+						"{{deviceFQDN}}",
+						"state",
+						"{{relayNumber}}"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "\"on\""
+				},
+				"description": "Turns one relay \"on\" (closed) or \"off\" (open) and leaves it there."
+			},
+			"response": [
+				{
+					"name": "SET State",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/state/{{relayNumber}}",
+							"protocol": "http",
+							"host": [
+								"{{microserviceURL}}"
+							],
+							"path": [
+								"{{deviceFQDN}}",
+								"state",
+								"{{relayNumber}}"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "\"on\""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "\"ok\""
+				}
+			]
+		},
+		{
+			"name": "SET All States",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/allstates",
+					"protocol": "http",
+					"host": [
+						"{{microserviceURL}}"
+					],
+					"path": [
+						"{{deviceFQDN}}",
+						"allstates"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "\"off\""
+				},
+				"description": "Turns every relay on the device \"on\" or \"off\"."
+			},
+			"response": [
+				{
+					"name": "SET All States",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/allstates",
+							"protocol": "http",
+							"host": [
+								"{{microserviceURL}}"
+							],
+							"path": [
+								"{{deviceFQDN}}",
+								"allstates"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "\"off\""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "\"ok\""
+				}
+			]
+		},
+		{
+			"name": "SET Trigger",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/trigger/{{relayNumber}}",
+					"protocol": "http",
+					"host": [
+						"{{microserviceURL}}"
+					],
+					"path": [
+						"{{deviceFQDN}}",
+						"trigger",
+						"{{relayNumber}}"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "\"1\""
+				},
+				"description": "Momentarily closes a relay: sets it \"on\" for the number of seconds in the body and then back to \"off\". The seconds can be a decimal between 0.1 and 5. The pulse is timed by the device itself, so the relay opens on time even if the network drops."
+			},
+			"response": [
+				{
+					"name": "SET Trigger",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/trigger/{{relayNumber}}",
+							"protocol": "http",
+							"host": [
+								"{{microserviceURL}}"
+							],
+							"path": [
+								"{{deviceFQDN}}",
+								"trigger",
+								"{{relayNumber}}"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "\"1\""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "\"ok\""
+				}
+			]
+		},
+		{
+			"name": "SET Timed Trigger",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/timedtrigger/{{relayNumber1}}/{{relayNumber2}}",
+					"protocol": "http",
+					"host": [
+						"{{microserviceURL}}"
+					],
+					"path": [
+						"{{deviceFQDN}}",
+						"timedtrigger",
+						"{{relayNumber1}}",
+						"{{relayNumber2}}"
+					]
+				},
+				"body": {
+					"mode": "raw",
+					"raw": "\"15\""
+				},
+				"description": "Triggers relayNumber1 for 1 second, waits until the number of seconds in the body (1 to 30) has passed, then triggers relayNumber1 and relayNumber2 together for 1 second.\n\nAn example use case for this endpoint is to bring a projector screen down for a specified number of seconds and then stop it (most screen controllers treat up + down together as stop)."
+			},
+			"response": [
+				{
+					"name": "SET Timed Trigger",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{microserviceURL}}/{{deviceFQDN}}/timedtrigger/{{relayNumber1}}/{{relayNumber2}}",
+							"protocol": "http",
+							"host": [
+								"{{microserviceURL}}"
+							],
+							"path": [
+								"{{deviceFQDN}}",
+								"timedtrigger",
+								"{{relayNumber1}}",
+								"{{relayNumber2}}"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "\"15\""
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "\"ok\""
+				}
+			]
+		}
+	]
+}
