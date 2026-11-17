@@ -6,10 +6,18 @@
 
 # Configuration variables - Update these values as needed
 MICROSERVICE_URL="localhost:8080"
-DEVICE_FQDN="10.8.80.12"   # append :502 if the device is set to Modbus TCP mode
+# The device address has no default so a production relay can't be switched by accident.
+# Run as: DEVICE_FQDN=<test relay address> ./waveshare_relay_curl_tests.sh
+DEVICE_FQDN="${DEVICE_FQDN:-}"   # append :502 if the device is set to Modbus TCP mode
 RELAY_NUMBER_1="1"
 RELAY_NUMBER_2="2"
 RELAY_NUMBER_3="3"
+
+if [ -z "$DEVICE_FQDN" ]; then
+    echo "Set DEVICE_FQDN to the address of a test relay, e.g.: DEVICE_FQDN=<address> $0"
+    echo "This script switches relays, so never point it at a production device."
+    exit 1
+fi
 
 echo "Starting Waveshare Relay Microservice API Tests..."
 echo "Microservice URL: $MICROSERVICE_URL"

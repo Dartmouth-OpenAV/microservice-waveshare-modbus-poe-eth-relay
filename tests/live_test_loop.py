@@ -9,7 +9,9 @@ actually did rather than the microservice's cache.
 WARNING: this switches every relay on the device. Disconnect anything (like a screen motor) first.
 
 Usage:
-    python3 tests/live_test_loop.py [--microservice localhost:8080] [--device 10.8.80.12] [--port 4196] [--loops 1]
+    python3 tests/live_test_loop.py --device DEVICE_IP [--microservice localhost:8080] [--port 4196] [--loops 1]
+
+--device is required and has no default, so the test can't switch a production relay by accident.
 
 Only uses the Python standard library.
 """
@@ -80,11 +82,14 @@ class Tester:
         self.check(status == 200 and value == "ok", "PUT %s %s -> %s %s" % (path, json.dumps(body), status, value))
 
     def get_fresh(self, path, timeout=10):
-        """GET an endpoint, waiting through the framework's 204 'not cached yet' responses."""
+        """GET an endpoint, waiting until the framework has a real value from the device.
+
+        The first GET returns 204. While the framework's first device read is in flight it
+        caches "unknown" as a placeholder and returns that with a 200, so skip it too."""
         deadline = time.time() + timeout
         while time.time() < deadline:
             status, value = self.request("GET", path)
-            if status == 200:
+            if status == 200 and value != "unknown":
                 return value
             time.sleep(0.25)
         raise RuntimeError("GET %s never returned 200" % path)
@@ -219,7 +224,8 @@ def run(t):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--microservice", default="localhost:8080")
-    parser.add_argument("--device", default="10.8.80.12")
+    parser.add_argument("--device", required=True,
+                        help="address of a test relay (never a production device: every relay gets switched)")
     parser.add_argument("--port", type=int, default=4196, help="device Modbus RTU over TCP port")
     parser.add_argument("--loops", type=int, default=1)
     args = parser.parse_args()

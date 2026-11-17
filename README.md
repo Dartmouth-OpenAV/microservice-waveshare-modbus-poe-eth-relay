@@ -27,21 +27,21 @@ As in every OpenAV microservice, the first GET of an endpoint returns HTTP 204 u
 
 ### Projector screen example
 
-With "down" wired to relay 1 and "up" wired to relay 2. Every PUT takes its value as a JSON request body. For `trigger` and `timedtrigger` the body is a number of seconds, sent as a JSON string like the other OpenAV microservices do (a bare number such as `1` works too).
+With "down" wired to relay 1 and "up" wired to relay 2. The examples use `DEVICE_IP` as a placeholder for your relay's address. Every PUT takes its value as a JSON request body. For `trigger` and `timedtrigger` the body is a number of seconds, sent as a JSON string like the other OpenAV microservices do (a bare number such as `1` works too).
 
 Screen down: close relay 1 for 1 second. The screen's controller takes the momentary contact and runs the motor down to its limit.
 ```
-curl -X PUT http://localhost:8080/10.8.80.12/trigger/1 -H "Content-Type: application/json" -d '"1"'
+curl -X PUT http://localhost:8080/DEVICE_IP/trigger/1 -H "Content-Type: application/json" -d '"1"'
 ```
 
 Screen up: close relay 2 for 1 second.
 ```
-curl -X PUT http://localhost:8080/10.8.80.12/trigger/2 -H "Content-Type: application/json" -d '"1"'
+curl -X PUT http://localhost:8080/DEVICE_IP/trigger/2 -H "Content-Type: application/json" -d '"1"'
 ```
 
 Screen down for 12 seconds, then stop. This pulses relay 1 ("down") for 1 second at the start, then 12 seconds after the start pulses relays 1 and 2 together for 1 second, which most screen controllers treat as "stop". In the path, the first relay moves the screen and the second is pulsed along with it to stop it. The body gives the seconds.
 ```
-curl -X PUT http://localhost:8080/10.8.80.12/timedtrigger/1/2 -H "Content-Type: application/json" -d '"12"'
+curl -X PUT http://localhost:8080/DEVICE_IP/timedtrigger/1/2 -H "Content-Type: application/json" -d '"12"'
 ```
 
 ```
@@ -67,7 +67,7 @@ A trigger or timedtrigger blocks the framework until it finishes, as it does in 
 ```
 docker build -t microservice-waveshare-relay .
 docker run -d -p 8080:80 microservice-waveshare-relay
-curl localhost:8080/10.8.80.12/healthcheck
+curl localhost:8080/DEVICE_IP/healthcheck
 ```
 
 The Docker build runs the unit tests (`source/driver_test.go`). They use a simulated Waveshare relay that speaks both RTU and Modbus TCP framing, so no hardware is needed at build time.
@@ -81,11 +81,29 @@ The Dockerfile is a multistage build. The `build` stage uses `golang:latest` to 
 `tests/live_test_loop.py` (Python standard library only) drives the microservice's REST API and checks every result with Modbus reads made directly against the device. It doesn't rely on the microservice's own cache. It covers all-on/off, each relay on its own, state readback, trigger pulse timing, timedtrigger sequencing, bad input, and `/errors`.
 
 ```
-python3 tests/live_test_loop.py --microservice localhost:8080 --device 10.8.80.12 --loops 5
+python3 tests/live_test_loop.py --microservice localhost:8080 --device DEVICE_IP --loops 5
 ```
+Neither test script has a default device address. Pass a test relay's address each time, never a production device's.
 
 `waveshare_relay_curl_tests.sh` and `Waveshare_Relay.postman_collection.json` exercise every endpoint by hand, the same way as the Global Cache equivalents.
 
 ## Framework
 
-`source/microservice-framework` is the [microservice-framework](https://github.com/Dartmouth-OpenAV/microservice-framework) git submodule (see `.gitmodules`). The framework's socket helpers read text lines up to a delimiter, which doesn't work for binary Modbus frames. So `source/modbus.go` opens its own short-lived TCP connection for each Modbus transaction. Calls still go through the framework's function stack and device lock.
+`source/microservice-framework` is the [microservice-framework](https://github.com/Dartmouth-OpenAV/microservice-framework) git submodule (see `.gitmodules`), the same setup as the other OpenAV microservices. The repo stores only a pointer to a framework commit, not the framework's files.
+
+Clone with the submodule:
+```
+git clone --recurse-submodules <this repo's URL>
+```
+If you already cloned without it, `source/microservice-framework` will be empty and the Docker build will fail. Fix it with:
+```
+git submodule update --init
+```
+To move to the latest framework, as the framework README asks microservices to do, then rebuild and test:
+```
+git submodule update --remote source/microservice-framework
+git add source/microservice-framework
+```
+The shared GitHub build workflow checks out submodules, so CI builds from the pinned framework commit.
+
+The framework's socket helpers read text lines up to a delimiter, which doesn't work for binary Modbus frames. So `source/modbus.go` opens its own short-lived TCP connection for each Modbus transaction. Calls still go through the framework's function stack and device lock.
